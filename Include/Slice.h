@@ -12,6 +12,12 @@
 
 namespace kvdb {
 
+
+/*
+   Slice 只是关心切片的位置 & 位置，不关心切片的实际的内容
+   将Slice看作是字节的切片
+*/
+
 class LEVELDB_EXPORT Slice {
  public:
     //创建Empty slice
@@ -77,7 +83,7 @@ inline bool operator==(const Slice& x, const Slice& y) {
    return ((x.size() == y.size()) && (memcmp(x.data(), y.data(), x.size()) == 0));
 }
 
-inline bool operator!=(const Slice& x, const Slice& y) const {
+inline bool operator!=(const Slice& x, const Slice& y) {
    return !(x == y);    //调用上面声明了的重载的==
 }
 
