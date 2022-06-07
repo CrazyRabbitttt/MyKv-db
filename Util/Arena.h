@@ -24,7 +24,7 @@ public:
     //对齐分配内存的方式
     char* AllocateAligned(size_t bytes);
 
-    //分配的内存
+    //分配的内存总使用量的估计值
     size_t MemoryUsage() const {
         return memory_usage_.load(std::memory_order_relaxed);
     }
