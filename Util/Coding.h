@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
-#include "Include/Slice.h"
+#include "../Include/Slice.h"
 
 namespace kvdb {
 

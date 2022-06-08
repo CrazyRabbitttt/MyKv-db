@@ -29,6 +29,9 @@ class  Slice {
     //传递String进行构造
     Slice(const std::string& s) : data_(s.data()), size_(s.size()) {}
 
+    //传入char* 进行Slice的构造
+    Slice(const char* s) : data_(s), size_(strlen(s)) {}
+
     //默认的进行拷贝行为？
     Slice(const Slice&) = default;
     Slice& operator=(const Slice&) = default;
