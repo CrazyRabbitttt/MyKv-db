@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <string>
 
-#include "Include/Slice.h"
+#include "Slice.h"
 
 namespace kvdb {
 

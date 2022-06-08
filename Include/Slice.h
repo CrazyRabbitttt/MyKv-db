@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <string>
 #include <cstring>
-#include "Include/Export.h"
+// #include "Export.h"
 
 namespace kvdb {
 
@@ -18,7 +18,7 @@ namespace kvdb {
    将Slice看作是字节的切片
 */
 
-class LEVELDB_EXPORT Slice {
+class  Slice {
  public:
     //创建Empty slice
     Slice():data_(""), size_(0) {}
@@ -72,6 +72,9 @@ class LEVELDB_EXPORT Slice {
    //判断x是否是*this的前缀
    bool starts_with(const Slice& x) const {
       return((size_ >= x.size_) && (memcmp(data_, x.data_, x.size_) == 0));
+   }
+   void Print() {
+      printf("%s\n", data_);
    }
 
  private:
