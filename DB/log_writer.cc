@@ -1,7 +1,7 @@
 #include "log_writer.h"
 
 #include <cstdint>
-
+#include <iostream>
 
 namespace kvdb {
 namespace log {
@@ -23,6 +23,7 @@ namespace log {
 
     //具体的将Slice传到Log中
     Status Writer::AddRecord1(const Slice& slice) {
+        printf("Now running the Add Record function, the silce:%s\n", slice.data());
         const char* ptr = slice.data();
         size_t left = slice.size();
 
@@ -32,6 +33,7 @@ namespace log {
         do {    
             const int leftover = kBlockSize - block_offset_;
             assert(leftover >= 0);
+            
             if (leftover < kHeaderSize) {       //剩余的空间写头部都不够，用0填充
                 //切换到下一个块
                 if (leftover > 0) {
@@ -75,16 +77,16 @@ namespace log {
         //将Header字段进行填充
 
         char buf[kHeaderSize];
-        buf[4] = static_cast<char>(len & 0xff);     //first byte 
-        buf[5] = static_cast<char>(len >> 8);       //second byte
+        buf[0] = buf[1] = buf[2] = buf[3] = '8';            //暂时将buf中的crc用字符8来进行
+        buf[4] = static_cast<char>(len & 0xff);
+        buf[5] = static_cast<char>(len >> 8);
         buf[6] = static_cast<char>(t);
+        printf("the header : %s..\n", buf);
 
         //计算crc校验和
         // uint32_t crc = crc32c::Extend(type_crc_[t], ptr, length);
         // crc = crc32c::Mask(crc);  // Adjust for storage
         // EncodeFixed32(buf, crc);
-
-        buf[0] = buf[1] = buf[2] = buf[3] = '8';            //暂时将buf中的crc用字符8来进行
 
         //将头部 和 payload写入
         Status s = dest_->Append(Slice(buf, kHeaderSize));

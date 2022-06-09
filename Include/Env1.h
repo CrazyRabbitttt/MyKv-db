@@ -29,7 +29,7 @@ class PosixWritableFile final : public WritableFile {
 
   const std::string filename_;
   // const std::string dirname_;  // The directory of filename_.
- public:
+public:
 
 
 Status PosixError(const std::string& context, int error_number) {
@@ -43,6 +43,8 @@ Status PosixError(const std::string& context, int error_number) {
 
   //实际上的将Slice写入Log
  Status Append(const Slice& data) override {
+   printf("The real write to the log(Append)...The data : %s\n", data.data());
+
    size_t write_size = data.size();         //需要写入的size
    const char* write_data = data.data();    //需要写入的指针的位置
    
@@ -105,6 +107,7 @@ private:
 
   Status WriteUnbuffered(const char* data, size_t size) {
     //将数据写到文件中
+    printf("具体的写到Log,fd中:%s, the fd : %d,\n", data, fd_);
     while (size > 0) {
       ssize_t write_result = write(fd_, data, size);
       if (write_result < 0) {

@@ -43,9 +43,17 @@ public:
     WritableFile(const WritableFile&) = delete;
     WritableFile& operator=(const WritableFile&) = delete;
 
-    virtual ~WritableFile();        //虚析构函数
+    
+    /*
+        🐛：old version : virtual ~WritableFile();
 
-    //纯虚函数后面加上0，子类必须进行重写
+           new version : virtual ~WritableFile() = default or {}
+    
+    */
+
+    virtual ~WritableFile() {};        //虚析构函数
+
+    //纯虚函数
     virtual Status Append(const Slice& data) = 0;
     virtual Status Close() = 0;
     virtual Status Flush() = 0;
