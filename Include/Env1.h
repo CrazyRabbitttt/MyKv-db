@@ -90,11 +90,22 @@ Status PosixError(const std::string& context, int error_number) {
     return status;
   }
 
+  //将缓冲区的刷到磁盘中
   Status Flush() override {
-    return Status::OK();
+    return FlushBuffer();     
   }
-  Status Sync() {
-    return Status::OK();
+  //进行同步，因为是WAL，所以写完日志之后就将数据进行同步到磁盘上面
+  Status Sync() override {
+
+    //todo : SyncDirIfManifest
+    Status status = FlushBuffer();
+    if (!status.ok()) {
+      return status;
+    }
+
+    //将同fd相关联的所有的缓冲刷新到磁盘上面
+    return SyncFd(fd_, filename_);
+
   }
 
 private:
@@ -121,6 +132,15 @@ private:
       size -= write_result;
     }
     return Status::OK();
+  }
+
+  //将同文件描述符号相关的所有的缓冲区的数据都持久化到磁盘上面,静态成员函数不能够在类内部进行设置
+  static Status SyncFd(int fd, const std::string& fd_path) {
+    bool sync_success = fsync(fd) == 0;     //将缓冲区的数据进行同步到磁盘上面,Return 0 if write ok 
+    if (sync_success) {
+      return Status::OK();
+    }
+    return PosixError(fd_path, errno);
   }
 
 

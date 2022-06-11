@@ -22,7 +22,7 @@ namespace log {
 
 
     //具体的将Slice传到Log中
-    Status Writer::AddRecord1(const Slice& slice) {
+    Status Writer::AddRecord(const Slice& slice) {
         printf("Now running the Add Record function, the silce:%s\n", slice.data());
         const char* ptr = slice.data();
         size_t left = slice.size();

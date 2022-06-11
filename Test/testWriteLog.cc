@@ -16,8 +16,8 @@ int main()
 
     Writer write(&writefile);
   
-    std::string s = "Guagua\n";
+    std::string s = "Bing\n";
     Slice slice(s);
-    write.AddRecord1(slice);
+    write.AddRecord(slice);
 
 }

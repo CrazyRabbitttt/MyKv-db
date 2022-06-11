@@ -27,7 +27,7 @@ public:
     ~Writer();
 
     //唯一的调用，将Slice写入到Log中,调用EmitPhy..函数
-    Status AddRecord1(const Slice& slice);
+    Status AddRecord(const Slice& slice);
 
 private:
     //实际上写到Log中的调用的函数

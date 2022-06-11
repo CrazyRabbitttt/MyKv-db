@@ -25,6 +25,7 @@
 #include <thread>
 #include <type_traits>
 #include <utility>
+#include <fcntl.h>
 
 #include "../Include/Status.h"
 
