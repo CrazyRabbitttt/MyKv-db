@@ -1,7 +1,11 @@
-#include "log_writer.h"
+#include "DB/log_writer.h"
+
 
 #include <cstdint>
 #include <iostream>
+#include "Util/Crc32c.h"
+
+
 
 namespace kvdb {
 namespace log {
@@ -10,6 +14,7 @@ namespace log {
     static void InitTypeCrc(uint32_t* type_crc) {
         for (int i = 0; i <= kMaxRecordType; i++) {
             char t = static_cast<char>(i);
+            type_crc[i] =  Crc32c::Value(&t, 1);
         }
     }
 
@@ -27,7 +32,7 @@ namespace log {
         const char* ptr = slice.data();
         size_t left = slice.size();
 
-        //Fragment to the Record
+        //Fragment to the Record, 将内容进行分段写入到Log文件中去
         Status s;
         bool begin = true;
         do {    

@@ -33,7 +33,7 @@ private:
     //实际上写到Log中的调用的函数
     Status EmitPhysicalRecord(RecordType type, const char* ptr, size_t length);
 
-    PosixWritableFile *dest_;
+    PosixWritableFile *dest_;   //其中操作的Log文件是哪一个
     int block_offset_;      //当前的块中的offset
 
     uint32_t type_crc_[kMaxRecordType + 1];

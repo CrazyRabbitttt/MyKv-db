@@ -14,9 +14,9 @@ int main()
     printf("The fd: %d\n", testfd);
     PosixWritableFile writefile(filename, testfd);
 
-    Writer write(&writefile);
+    Writer write(&writefile);                                   //传进来抽象的Posix下的写文件类， 进行实际的写操作
   
-    std::string s = "Bing\n";
+    std::string s = "Xiao, Bing\n";
     Slice slice(s);
     write.AddRecord(slice);
 

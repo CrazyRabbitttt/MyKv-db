@@ -7,6 +7,7 @@
 namespace kvdb {
 
 
+
 class PosixWritableFile final : public WritableFile {
  public:
   PosixWritableFile(std::string filename, int fd)
@@ -41,7 +42,7 @@ Status PosixError(const std::string& context, int error_number) {
 }
 
 
-  //实际上的将Slice写入Log
+  //实际上的将Slice写入Log, Physical 
  Status Append(const Slice& data) override {
    printf("The real write to the log(Append)...The data : %s\n", data.data());
 
@@ -135,7 +136,7 @@ private:
   }
 
   //将同文件描述符号相关的所有的缓冲区的数据都持久化到磁盘上面,静态成员函数不能够在类内部进行设置
-  static Status SyncFd(int fd, const std::string& fd_path) {
+  Status SyncFd(int fd, const std::string& fd_path) {
     bool sync_success = fsync(fd) == 0;     //将缓冲区的数据进行同步到磁盘上面,Return 0 if write ok 
     if (sync_success) {
       return Status::OK();

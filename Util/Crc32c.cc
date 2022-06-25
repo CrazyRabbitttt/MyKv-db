@@ -1,14 +1,15 @@
 
-#include "Crc32c.h"
+#include "Util/Crc32c.h"
 #include <cstddef>
 #include <cstdint>
 
-#include "./Util/Coding.h"
+#include "Coding.h"
+#include "Port/Port_stdxx.h"
 
 
 
 namespace leveldb {
-namespace crc32c {
+namespace Crc32c {
 
 namespace {
 
@@ -242,7 +243,7 @@ static constexpr const uint32_t kCRC32Xor = static_cast<uint32_t>(0xffffffffU);
 
 // Reads a little-endian 32-bit integer from a 32-bit-aligned buffer.
 inline uint32_t ReadUint32LE(const uint8_t* buffer) {
-  return DecodeFixed32(reinterpret_cast<const char*>(buffer));
+  return kvdb::DecodeFixed32(reinterpret_cast<const char*>(buffer));
 }
 
 // Returns the smallest address >= the given address that is aligned to N bytes.
