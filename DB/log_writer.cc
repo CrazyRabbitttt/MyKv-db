@@ -1,16 +1,16 @@
-#include "DB/log_writer.h"
 
 
+#include "log_writer.h"
 #include <cstdint>
 #include <iostream>
-#include "Util/Crc32c.h"
-
-
+#include "../Util/Crc32c.h"
+#include "../Util/Coding.h"
 
 namespace kvdb {
 namespace log {
 
-    //进行crc校验和的设置
+
+    //进行crc校验和的设置, 将校验和放在前四个字节
     static void InitTypeCrc(uint32_t* type_crc) {
         for (int i = 0; i <= kMaxRecordType; i++) {
             char t = static_cast<char>(i);
@@ -20,8 +20,14 @@ namespace log {
 
 
     Writer::Writer(PosixWritableFile* dest) 
-        :dest_(dest), block_offset_(0) {}
+        :dest_(dest), block_offset_(0) {
+            InitTypeCrc(type_crc_);
+        }
     
+    Writer::Writer(PosixWritableFile *dest, uint64_t dest_length) 
+        :dest_(dest), block_offset_(dest_length % kBlockSize) 
+        {InitTypeCrc(type_crc_);}
+
     Writer::~Writer() = default;
 
 
@@ -82,16 +88,17 @@ namespace log {
         //将Header字段进行填充
 
         char buf[kHeaderSize];
-        buf[0] = buf[1] = buf[2] = buf[3] = '8';            //暂时将buf中的crc用字符8来进行
+        // buf[0] = buf[1] = buf[2] = buf[3] = '8';            //暂时将buf中的crc用字符8来进行
         buf[4] = static_cast<char>(len & 0xff);
         buf[5] = static_cast<char>(len >> 8);
         buf[6] = static_cast<char>(t);
-        printf("the header : %s..\n", buf);
 
         //计算crc校验和
-        // uint32_t crc = crc32c::Extend(type_crc_[t], ptr, length);
-        // crc = crc32c::Mask(crc);  // Adjust for storage
-        // EncodeFixed32(buf, crc);
+        uint32_t crc = Crc32c::Extend(type_crc_[t], ptr, len);
+        crc = Crc32c::Mask(crc);
+        EncodeFixed32(buf, crc);        //将四字节编码到buf中
+        printf("the header : %s..\n", buf);
+
 
         //将头部 和 payload写入
         Status s = dest_->Append(Slice(buf, kHeaderSize));

@@ -6,7 +6,6 @@
 #include "./Log_format.h"
 #include "../Include/Slice.h"
 #include "../Include/Status.h"
-#include "../Include/Env.h"
 #include "../Include/Env1.h"
 
 namespace kvdb {
@@ -19,6 +18,9 @@ class Writer {
 public:
     //不允许隐式转换
     explicit Writer(PosixWritableFile* dest);
+
+    Writer(PosixWritableFile* dest, uint64_t dest_length);
+
 
     //禁止拷贝的行为
     Writer(const Writer& ) = delete;

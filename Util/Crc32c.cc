@@ -1,14 +1,14 @@
 
-#include "Util/Crc32c.h"
+#include "Crc32c.h"
 #include <cstddef>
 #include <cstdint>
 
 #include "Coding.h"
-#include "Port/Port_stdxx.h"
+#include "../Port/Port_stdxx.h"
 
 
 
-namespace leveldb {
+namespace kvdb {
 namespace Crc32c {
 
 namespace {
@@ -372,5 +372,5 @@ uint32_t Extend(uint32_t crc, const char* data, size_t n) {
   return l ^ kCRC32Xor;
 }
 
-}  // namespace crc32c
-}  // namespace leveldb
+}  // namespace Crc32c
+}  // namespace kvdb
