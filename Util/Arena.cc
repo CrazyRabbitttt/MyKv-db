@@ -1,36 +1,52 @@
-#include "Util/Arena.h"
+#include "Arena.h"
 
 namespace kvdb {
 
 static const int kBlockSize = 4096;
 
 Arena::Arena() 
-    :alloc_ptr_(nullptr), alloc_bytes_remaining_(0), memory_usage_(0) {}
+    :allc_ptr(nullptr), alloc_bytes_reamining_(0), memory_usage_(0)
+    {}
 
+//析构函数直接全部释放掉
 Arena::~Arena() {
     for (size_t i = 0; i < blocks_.size(); i++) {
         delete[] blocks_[i];
     }
 }
 
-//进行新的内存的设置
+
+char* Arena::Allocate(size_t bytes) {
+    assert(bytes > 0);
+    if (bytes <= alloc_bytes_reamining_) {
+        //如果说需要分配的小雨可供分配的
+        char* result = allc_ptr;
+        allc_ptr += bytes;
+        alloc_bytes_reamining_ -= bytes;
+        return result;
+    }
+    return AllocateFallback(bytes);
+}
+
+
 char* Arena::AllocateFallback(size_t bytes) {
-    //如果说需要的内存是大于1K，重新分配,但是不会浪费掉原来的剩余的空间
+    //如果说需要的内存是 > 1K，重新进行分配，但是不会浪费
     if (bytes > kBlockSize / 4) {
         char* result = AllocateNewBlock(bytes);
         return result;
     }
 
-    //如果不是的话，直接浪费掉(浪费的空间也是小于1K的，因为已知剩余的空间是小于bytes的)
-    alloc_ptr_ = AllocateNewBlock(kBlockSize);
-    alloc_bytes_remaining_ = kBlockSize;
+    //如果不是的话就直接浪费掉（浪费空间数目小于1K）
+    allc_ptr = AllocateNewBlock(kBlockSize);
+    alloc_bytes_reamining_ = kBlockSize;
 
-    //从新设置的内存进行分配
-    char* result = alloc_ptr_;
-    alloc_ptr_ += bytes;
-    alloc_bytes_remaining_ -= bytes;
+    //从新分配的内存中进行分配
+    char* result = allc_ptr;
+    allc_ptr += bytes;
+    alloc_bytes_reamining_ -= bytes;
     return result;
 }
+
 
 //进行内存对齐的分配
 char* Arena::AllocateAligned(size_t bytes) {
@@ -38,16 +54,16 @@ char* Arena::AllocateAligned(size_t bytes) {
     //位运算技巧，判断是否是偶数
     static_assert((align & (align - 1)) == 0, "Pointer size should be a power of 1");
     //位运算技巧：进行取模运算
-    size_t current_mod = reinterpret_cast<uintptr_t>(alloc_ptr_) & (align - 1);
+    size_t current_mod = reinterpret_cast<uintptr_t>(allc_ptr) & (align - 1);
     size_t slop = (current_mod == 0 ? 0 : align - current_mod);
 
     //下面进行内存的分配
     size_t needed = bytes + slop;
     char* result;
-    if(needed <= alloc_bytes_remaining_) {
-        result = alloc_ptr_ + slop;
-        alloc_ptr_ += needed;
-        alloc_bytes_remaining_ -= needed;
+    if(needed <= alloc_bytes_reamining_) {
+        result = allc_ptr + slop;
+        allc_ptr += needed;
+        alloc_bytes_reamining_ -= needed;
     } else {
         //Fall Back 肯定是返回的是对齐了的
         result = AllocateFallback(bytes);
@@ -58,12 +74,13 @@ char* Arena::AllocateAligned(size_t bytes) {
 }
 
 
-//进行新的内存的分配
+//进行内存的分配
 char* Arena::AllocateNewBlock(size_t block_bytes) {
     char* result = new char[block_bytes];
     blocks_.push_back(result);
     memory_usage_.fetch_add(block_bytes + sizeof(char*), std::memory_order_relaxed);
     return result;
 }
+
 
 }   //namespace kvdb

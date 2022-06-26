@@ -16,7 +16,7 @@ int main()
 
     Writer write(&writefile);                                   //传进来抽象的Posix下的写文件类， 进行实际的写操作
   
-    std::string s = "Xiao, Bing\n";
+    std::string s = "guaguaguaguaguaguagugaugau,wehfjiqwguibqwefhui\n";
     Slice slice(s);
     write.AddRecord(slice);
 
