@@ -156,6 +156,40 @@ int SkipList<Key, Comparator>::RandomHeight() {
 }
 
 
+template<typename Key, class Comparator> 
+void SkipList<Key, Comparator>::Insert(const Key& key) {
+    //初始化一下prev
+    Node* prev[kMaxHeight];
+
+    //查找节点并且将prev安置好
+    Node* node = FindgreaterOrEqual(key, prev);
+    //不能够进行重复的插入操作
+    assert(node == nullptr || !Equal(key, node->key));
+
+    int insertHeight = RandomHeight();
+
+    //如果随机的高度比当前最大的节点还是要大的，更新一下层数
+    if (insertHeight > GetMaxGeight()) {
+        //update prev node 
+        for (int i = GetMaxGeight(); i < insertHeight; i++) {
+            prev[i] = header_;
+        }
+
+        //不需要进行加读锁，leveldb中的特殊的性质决定如此
+        max_height_.store(insertHeight, std::memory_order_relaxed);
+    }   
+
+    //进行插入操作
+    node = NewNode(key, insertHeight);
+    for (int i = 0; i < insertHeight; i++) {
+        node->NoBarrier_SetNext(i, prev[i]->NoBarrier_Next(i));
+        prev[i]->SetNext(i, node);
+    }
+
+
+}
+
+
 
 
 //每层查找最后一个小于Key的节点
@@ -164,13 +198,24 @@ typename SkipList<Key, Comparator>::Node*               //typename 用在这里�
 SkipList<Key, Comparator>::FindgreaterOrEqual(const Key& key, Node** prev) const {
     //双重指针就相当于单指针的数组
     Node* pNode = header_;               //begin from header node 
-    int level = GetMaxGeight() - 1;    //从最高层次开始
-    for (int i = level; i >= 0; i--) {
-        while (KeyIsAfterNode(key, pNode->Next(i))) {    //在目前层次的下一个
-            pNode = pNode -> next_[i];
+    int level = GetMaxGeight() - 1;
+    while (true) {
+        Node* next = pNode->Next(level);    
+
+        if (KeyIsAfterNode(key, next)) {        //如果value大于node的节点值
+            //那么就继续在这一层次进行寻找
+            pNode = next;                       //移动一下索引的路径node
+        } else {
+            //如果不是的话，那么就要下降层次
+            if (prev != nullptr) prev[level] = pNode;       //维护好前面的节点，用于插入
+
+            if (level == 0) {
+                return next;
+            } else {
+                level --;
+            }
         }
-    }   
-    return nullptr;
+    }
 }
 
 //判断Key的值是不是大于node的值
@@ -180,17 +225,13 @@ bool SkipList<Key, Comparator>::KeyIsAfterNode(const Key& key, Node* node) const
 }
 
 
-
-
-
 template<typename Key, class Comparator>
 bool SkipList<Key, Comparator>::Contains(const Key& key) const {
     Node* tmp = FindgreaterOrEqual(key, nullptr);
-    if (x != nullptr && Equal(key, tmp->key)) {
+    if (tmp->key == key) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 }
