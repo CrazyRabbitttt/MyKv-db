@@ -32,6 +32,40 @@ public:
     //Return true iff equls to key in the list 
     bool Contains(const Key& key) const;
 
+
+    //Iterator
+    class Iterator {
+    public:
+        explicit Iterator(const SkipList* list);
+        
+        //node是否是合法的
+        bool Valid() const;
+
+        //Return key at the position 
+        const Key& key() const;
+
+        //Advance to next position 
+        void Next();
+
+        //Advance to prev position 
+        void Prev();
+
+        //前进寻找第一个大于target 的node
+        void Seek(const Key& target);
+
+        //List 的入口
+        void SeekForFirst();
+
+        void SeekForLast();
+
+    private:    
+        const SkipList* list_;
+        Node* node_;    
+    };
+
+
+
+
 private:
     static const int kMaxHeight = 12;
 
@@ -53,6 +87,10 @@ private:
 
     Node* FindgreaterOrEqual(const Key& key, Node** prev) const;
 
+    Node* FindLessThan(const Key& key) const;
+
+    Node* FindLast() const;
+
     Node* NewNode(const Key& key, int height);
 
 
@@ -71,11 +109,60 @@ private:
 
 };
 
+template <typename Key, class Comparator>
+inline SkipList<Key, Comparator>::Iterator::Iterator(const SkipList* list) {
+  list_ = list;
+  node_ = nullptr;
+}
+
+
 
 template<typename Key, class Comparator> 
-bool SkipList<Key, Comparator>::Contains(const Key& key) const {
-    Node* x = Find
+inline bool SkipList<Key, Comparator>::Iterator::Valid() const {
+    return node_ != nullptr;
 }
+
+template<typename Key, class Comparator> 
+inline const Key& SkipList<Key, Comparator>::Iterator::key() const {
+    assert(Valid());    //Ensure the node is valid
+    return node_->key;
+}
+
+template<typename Key, class Comparator>
+inline void SkipList<Key, Comparator>::Iterator::Next() {
+    assert(Valid());
+    node_ = node_->Next(0);         //最底层的指针的变换
+}
+
+template<typename Key, class Comparator>
+inline void SkipList<Key, Comparator>::Iterator::Prev() {
+    assert(Valid());
+    node_ = list_->FindLessThan(key);
+    if (node_ == list_->header_){
+        node_ = nullptr;
+    }
+}
+
+template<typename Key, class Comparator>
+inline void SkipList<Key, Comparator>::Iterator::Seek(const Key& target) {
+    //seek for the node that greater than target
+    node_ = FindgreaterOrEqual(target, nullptr);
+}
+
+template<typename Key, class Comparator>
+inline void SkipList<Key, Comparator>::Iterator::SeekForFirst() {
+    node_ = list_->header_->Next(0);
+}
+
+template<typename Key, class Comparator>
+inline void SkipList<Key, Comparator>::Iterator::SeekForLast() {
+    node_ = list_->FindLast();
+    if (node_ == list_->header_) {
+        node_ = nullptr;
+    }
+}
+
+
 
 
 template<typename Key, class Comparator> 
@@ -190,6 +277,47 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
 }
 
 
+template<typename Key, class Comparator>
+typename SkipList<Key, Comparator>::Node*
+SkipList<Key, Comparator>::FindLessThan(const Key& key) const {
+    //小于给定key的节点
+    Node* pNode = header_;
+    int level = GetMaxGeight() - 1;
+    while(true) {
+        //要么是头，要么是小于的
+        assert(pNode == header_ || compare_(pNode->key, key) < 0);
+        Node* next = pNode->Next(level);
+        if (compare_(next->key, key) >= 0) {
+            //advance to low hright
+            if (level == 0) {
+                return pNode;
+            }else {
+                level--;
+            }
+        }else {
+            //advance to next node 
+            pNode = next;
+        }
+    }
+}
+
+template <typename Key, class Comparator>
+typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::FindLast() const {
+    Node* pNode = header_;
+    int level = GetMaxGeight() - 1;
+    while (true) {
+        Node* next = pNode->Next(level);
+        if (next == nullptr) {
+            if (level == 0) {
+                return pNode;
+            }else {
+                level--;
+            }
+        } else {
+            pNode = next;
+        }
+    }
+}
 
 
 //每层查找最后一个小于Key的节点
@@ -228,11 +356,14 @@ bool SkipList<Key, Comparator>::KeyIsAfterNode(const Key& key, Node* node) const
 template<typename Key, class Comparator>
 bool SkipList<Key, Comparator>::Contains(const Key& key) const {
     Node* tmp = FindgreaterOrEqual(key, nullptr);
-    if (tmp->key == key) {
+    if (x != nullptr && Equal(key, tmp->key)) {
         return true;
     }
     return false;
 }
+
+
+
 
 }
 
