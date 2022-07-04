@@ -269,7 +269,10 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
     //进行插入操作
     node = NewNode(key, insertHeight);
     for (int i = 0; i < insertHeight; i++) {
+
+        //no barrier 
         node->NoBarrier_SetNext(i, prev[i]->NoBarrier_Next(i));
+        //here will ensure sync
         prev[i]->SetNext(i, node);
     }
 
