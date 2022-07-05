@@ -8,9 +8,11 @@
 
 namespace kvdb {
 
-Comparator::~Comparator() = default;
+// Comparator::~Comparator() = default;
 
-namespace {
+
+//匿名命名空间， 相当于是internal 
+namespace  compare{
     //用字节顺序进行比较的比较器
 class ByteComparator : public Comparator {
  public:

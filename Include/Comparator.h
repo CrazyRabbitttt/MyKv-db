@@ -12,7 +12,8 @@ class Slice;
 class Comparator {
 
 public:
-    virtual ~Comparator();
+
+    virtual ~Comparator() {};
 
     virtual int Compare(const Slice& a, const Slice& b) const = 0;
 
