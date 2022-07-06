@@ -7,7 +7,7 @@
 
 namespace kvdb {
 
- void Memtable::Add(SequenceNumber s, ValueType type, const Slice& key, const Slice& value) {
+ void Memtable::Add(SequenceNumber s, ValueType type, const Slice& userkey, const Slice& value) {
 
     /*
       KeySize: 32bit 
@@ -16,8 +16,20 @@ namespace kvdb {
       v-size : 32bit 
       v-Byte : char[valuesize]
     */
-    size_t key_size   = key.size();
+    size_t key_size   = userkey.size();
     size_t value_size = value.size();
+    size_t internal_key_size = key_size + 8;      //user key size + 8 byte(seq, valueType)
+    
+    //值进行很好的压缩，最终需要的存储的空间大小是多少(Byte
+    const size_t encoded_len = VarintLength(internal_key_size) + internal_key_size + 
+                               VarintLength(value_size) + value_size;
+
+    char* buf = arena_.Allocate(encoded_len);
+    char* p   = EncodeVarint32(buf, internal_key_size);
+                       
+
+
+
     //TODO：
 
 
