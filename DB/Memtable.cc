@@ -21,7 +21,7 @@ namespace kvdb {
     size_t value_size = value.size();
     size_t internal_key_size = key_size + 8;      //user key size + 8 byte(seq, valueType)
     
-    //值进行很好的压缩，最终需要的存储的空间大小是多少(Byte
+    //值进行很好的压缩，最终需要的存储的空间大小是多少(Byte]
     const size_t encoded_len = VarintLength(internal_key_size) + internal_key_size + 
                                VarintLength(value_size) + value_size;
 
@@ -52,7 +52,23 @@ namespace kvdb {
 
  } 
 
+ bool Memtable::Get(const LookupKey& key, std::string* value, Status* status) {
+    Slice memkey = key.memtable_key();
+    Table::Iterator iter(&table_);
+    iter.Seek(memkey.data());             //寻找的是key的部分，最终查找的结果存放在iter类中的node_中
+    
+    if (iter.Valid()) {
+        
 
+
+
+    } 
+
+
+
+
+
+ }
 
  
 

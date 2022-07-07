@@ -36,7 +36,7 @@ public:
     //Iterator
     class Iterator {
     public:
-        explicit Iterator(const SkipList* list);
+        explicit Iterator(const SkipList* list);        //明确是哪一个跳表
         
         //node是否是合法的
         bool Valid() const;
@@ -50,7 +50,7 @@ public:
         //Advance to prev position 
         void Prev();
 
-        //前进寻找第一个大于target 的node
+        //前进寻找第一个大于等于target 的node
         void Seek(const Key& target);
 
         //List 的入口

@@ -99,6 +99,18 @@ inline u_int64_t DecodeFixed64(const char* ptr) {
 }
 
 
+const char* GetVarint32PtrFallBack(const char* p, const char* limit, uint32_t* value);
+
+inline const char* GetVarint32Ptr(const char* p, const char* limit, uint32_t* value) {
+  
+}
+
+
+
+
+
+
+
 }
 
 #endif

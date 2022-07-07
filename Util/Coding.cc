@@ -49,9 +49,9 @@ namespace kvdb {
         return reinterpret_cast<char*>(ptr);
     }
 
-    void PutVarint64(std::string* dst, uint64_t) {
+    void PutVarint64(std::string* dst, uint64_t value) {
         char buf[10];
-        char* ptr = EncodeVarint64(buf, v);
+        char* ptr = EncodeVarint64(buf, value);
         dst->append(buf, ptr - buf);
     }
 
@@ -61,10 +61,43 @@ namespace kvdb {
         //1 2 4 8 16 32 64 128
         int len = 1;
         while (value >= 128) {
-            v >>= 7;
+            value >>= 7;
             len++;
         }
         return len;
+    }
+
+
+    //进行32-bit整数的解码操作，写到value中去,返回的是解码之后的指针的位置
+    const char* GetVarint32PtrFallBack(const char* p, const char* limit, uint32_t* value) {
+        uint32_t result = 0;
+        //因为写入的时候有效位是7位/字节，所以步长是7
+        for (uint32_t shift = 0; shift <= 28 && p < limit; shift += 7) {
+            uint32_t byte = *(reinterpret_cast<const uint8_t*>(p));     //获取到一个字节的数据，按照uint8的方式解读
+            p++;
+            if (byte & (1 << 7)) {
+                //the largest bit is 1, means more 
+                result |= ((byte & 127) << shift);      //去掉最高位置的1
+            } else {        
+                //No more, the last 
+                result |= (byte << shift);
+                *value = result;
+                return reinterpret_cast<const char*>(p);
+            }
+        }
+        return nullptr;
+    }
+
+    bool GetVarint32(Slice* input, uint32_t* value) {
+        const char* p = input->data();
+        const char* limit = p + input->size();
+        const char* q = GetVarint32Ptr(p, limit, value);
+        if (q == nullptr) {
+            return false;
+        } else {
+            *input = Slice(q, limit - q);
+            return true;
+        }
     }
 
 

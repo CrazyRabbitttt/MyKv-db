@@ -42,7 +42,7 @@ class Memtable{
 //将seq, type, key, value压缩过后写到buf中，然后插入到跳表上面
 void Add(SequenceNumber seq, ValueType type, const Slice& key, const Slice& value);
 
-
+bool Get(const LookupKey& key, std::string* value, Status *status);
 
 
  private:

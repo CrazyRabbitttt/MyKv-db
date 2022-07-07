@@ -34,12 +34,20 @@ public:
 
     ~LookupKey();
 
-    //返回适用于Memtable中的key
+    //返回适用于Memtable中的key，构造函数中将三个指针连接起来了
     Slice memtable_key() const {
-
+        return Slice(size_, end_ - size_);
     }
 
+    //返回从userkey开始的Slice & seq & type 
+    Slice internal_key() const {
+        return Slice(userKey_, end_ - userKey_);
+    }
 
+    //返回纯纯的userkey
+    Slice user_key() const {
+        return Slice(userKey_, end_ - userKey_ - 8);
+    }
 
 private:
     //Get的时候传入的是Key, args for construct the Key 
@@ -56,6 +64,9 @@ private:
     char space_[200];  
 };
 
+inline LookupKey::~LookupKey() {
+    if (size_ != space_) delete[] size_;
+}
 
 
 
