@@ -27,7 +27,7 @@ class Memtable{
 
  //Increase reference count.
  void Ref() {
-    ++ref_;
+    ++ref_;   
  }
 
  void UnRef() {
@@ -39,10 +39,10 @@ class Memtable{
     }
  }
 
+//将seq, type, key, value压缩过后写到buf中，然后插入到跳表上面
 void Add(SequenceNumber seq, ValueType type, const Slice& key, const Slice& value);
 
-//TODO:GET function 
-// void Get(const )
+
 
 
  private:
