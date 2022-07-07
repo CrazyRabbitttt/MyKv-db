@@ -7,7 +7,16 @@
 
 
 namespace kvdb {
+    //跳过size，返回value
+static Slice GetLengthPrefixedSlice(const char* data) {
+  uint32_t len;
+  const char* p = data;
+  p = GetVarint32Ptr(p, p + 5, &len);  // +5: we assume "p" is not corrupted
+  return Slice(p, len);
+}
 
+
+ 
  void Memtable::Add(SequenceNumber seq, ValueType type, const Slice& userkey, const Slice& value) {
 
     /*
@@ -58,16 +67,27 @@ namespace kvdb {
     iter.Seek(memkey.data());             //寻找的是key的部分，最终查找的结果存放在iter类中的node_中
     
     if (iter.Valid()) {
-        
-
-
-
+        const char* entry = iter.key();   //从跳表中拿到的entry 
+        uint32_t key_length = 0;
+        //这个函数会拿到internal_size, 并且跳过size的部分
+        const char* userkey_ptr = GetVarint32Ptr(entry, entry + 5, &key_length);
+        if (comparator_.comparator.user_Comparator()->Compare(key.user_key(), Slice(userkey_ptr, key_length - 8)) == 0) {
+            //传入的userKey同跳表中拿到的userKey是一样的
+            //sequence & type
+            const uint64_t tag = DecodeFixed64(userkey_ptr + key_length);
+            switch (static_cast<ValueType>(tag & 0xff)) {
+              case kTypeValue: {
+                  Slice v = GetLengthPrefixedSlice(userkey_ptr + key_length);
+                  value->assign(v.data(), v.size());
+                  return true;
+              }
+              case kTypeDelete: 
+                *status = Status::NotFound(Slice());
+                return true;
+            }
+        }
     } 
-
-
-
-
-
+    return false;
  }
 
  

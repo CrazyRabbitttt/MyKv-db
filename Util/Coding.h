@@ -102,7 +102,15 @@ inline u_int64_t DecodeFixed64(const char* ptr) {
 const char* GetVarint32PtrFallBack(const char* p, const char* limit, uint32_t* value);
 
 inline const char* GetVarint32Ptr(const char* p, const char* limit, uint32_t* value) {
-  
+
+    if (p < limit) {
+      uint32_t result = *(reinterpret_cast<const uint8_t*>(p));
+      if (result & 128 == 0) {    //less than 128
+          *value = result;
+          return p + 1;
+      }
+    } 
+    return GetVarint32PtrFallBack(p, limit, value);
 }
 
 

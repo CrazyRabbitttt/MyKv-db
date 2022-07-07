@@ -64,6 +64,7 @@ bool Get(const LookupKey& key, std::string* value, Status *status);
    
   ~Memtable();       //私有：因为只有UnRef() 才调用析构函数
   
+  KeyComparator comparator_;
   Arena arena_;
   Table table_;
  

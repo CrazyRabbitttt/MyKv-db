@@ -3,6 +3,8 @@
 
 #include <string>
 #include <stdint.h>
+#include <stddef.h>
+#include <string>
 
 #include "../Include/Comparator.h"
 namespace kvdb {
@@ -19,6 +21,11 @@ typedef uint64_t SequenceNumber;
 static const SequenceNumber kMaxSequenceNumber = ((0x1ull << 56) - 1);
 
 static const ValueType kValueTypeForSeek = kTypeValue;
+
+
+inline Slice ExtractUserKey(const Slice& internal_key) {
+  return Slice(internal_key.data(), internal_key.size() - 8);
+}
 
 
 //A tool class for Get
