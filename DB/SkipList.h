@@ -74,7 +74,7 @@ private:
 //Functions
     //不保证并发性质的读取height
     inline int GetMaxGeight() const {
-        return max_align_t.load(std::memory_order_relaxed);
+        return max_height_.load(std::memory_order_relaxed);
     }
 
     bool Equal(const Key& a, const Key& b) const {
@@ -352,14 +352,14 @@ SkipList<Key, Comparator>::FindgreaterOrEqual(const Key& key, Node** prev) const
 //判断Key的值是不是大于node的值
 template<typename Key, class Comparator> 
 bool SkipList<Key, Comparator>::KeyIsAfterNode(const Key& key, Node* node) const {
-    return (n != nullptr && compare_(n->key, key) < 0);
+    return (node != nullptr && compare_(node->key, key) < 0);
 }
 
 
 template<typename Key, class Comparator>
 bool SkipList<Key, Comparator>::Contains(const Key& key) const {
     Node* tmp = FindgreaterOrEqual(key, nullptr);
-    if (x != nullptr && Equal(key, tmp->key)) {
+    if (tmp != nullptr && Equal(key, tmp->key)) {
         return true;
     }
     return false;
