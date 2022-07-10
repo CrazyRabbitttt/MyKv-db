@@ -146,7 +146,7 @@ inline void SkipList<Key, Comparator>::Iterator::Prev() {
 template<typename Key, class Comparator>
 inline void SkipList<Key, Comparator>::Iterator::Seek(const Key& target) {
     //seek for the node that greater than target
-    node_ = FindgreaterOrEqual(target, nullptr);
+    node_ = list_->FindgreaterOrEqual(target, nullptr);
 }
 
 template<typename Key, class Comparator>
