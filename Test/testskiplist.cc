@@ -22,9 +22,7 @@ struct Comparator1 {
         else return 0;
     }
 };
- 
-int main()
-{
+    
     // kvdb::Memtable memtable1;
     // kvdb::compare::ByteComparator com1;
     Comparator1 com2;
@@ -33,18 +31,39 @@ int main()
 
     Table table(com2, &arean_);
 
-    printf("Begin insert...\n");
-    for (int i = 89; i < 367; i++) {
-        table.Insert(i);
-    }
-    const int sum = 250;
+void testInsertAndContains() {
+    printf("Begin test insert and contains ...\n");
     int count = 0;
-    printf("Begin judge if contains...\n");
-    for (int i = 101; i <= 250; i++) {
-        if (table.Contains(i)) count ++;
+    int grade = 0;
+    for (int i = 50; i <= 150; i++) {
+        table.Insert(i);
+        count ++;
     }
+    assert(count == 101);
+    if (count == 101) grade++;
+    // printf("Begin judge if contains..., the current count : %d\n", count);
+    for (int i = 50; i <= 150; i++) {
+        if (table.Contains(i)) count --;
+    }
+    assert(count == 0);
+    if (count == 0) grade ++;
+    // printf("The final count %d, should 0\n", count);
 
-    printf("hit : %d, sum : 150\n", count);
+    int fins = 0;
+    for (int i = 1; i <= 500; i++) {
+        if (table.Contains(i) && !(i >= 50 && i <= 150)) {
+            fins++;
+        }
+    }
+    assert(fins == 0);
+    if (fins == 0) grade++;
+
+    printf("There are three tests, pass grade %d / 3\n", grade);
+}
+
+int main()
+{
+    testInsertAndContains();
 
 }
 
