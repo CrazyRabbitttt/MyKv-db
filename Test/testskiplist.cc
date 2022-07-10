@@ -3,7 +3,7 @@
 // #include "../Include/Comparator.h"
 // #include "../Util/Comparator.cc"
 #include "../DB/SkipList.h"
-#include "../Util/Arena.h"
+#include "../Util/Arena.cc"
 #include <stdio.h>
 
 using namespace kvdb;
@@ -11,7 +11,7 @@ using namespace kvdb;
 typedef uint64_t Key;
 
 struct Comparator1 {
-    int operator() (const Key& a, const Key& b) {
+    int operator() (const Key& a, const Key& b) const {         //这里不加const 就报错
         if (a < b) return -1;
         else if (a > b) return +1; 
         else return 0;
@@ -44,7 +44,7 @@ int main()
         if (table.Contains(i)) count ++;
     }
 
-    printf("hit : %d, sum : 250\n", count);
+    printf("hit : %d, sum : 150\n", count);
 
 }
 

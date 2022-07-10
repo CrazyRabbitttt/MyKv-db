@@ -358,7 +358,7 @@ bool SkipList<Key, Comparator>::KeyIsAfterNode(const Key& key, Node* node) const
 
 template<typename Key, class Comparator>
 bool SkipList<Key, Comparator>::Contains(const Key& key) const {
-    Node* tmp = FindgreaterOrEqual(key, nullptr);
+    Node* tmp = FindgreaterOrEqual(key, nullptr);       
     if (tmp != nullptr && Equal(key, tmp->key)) {
         return true;
     }

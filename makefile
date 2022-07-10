@@ -8,8 +8,8 @@ testCom:     Include/Comparator.h  Test/testComparator.cc Include/Slice.h Util/C
 	g++  Include/Comparator.h  Test/testComparator.cc Include/Slice.h Util/Comparator.cc    -g -o testCom 
 
 
-testSkipList:  DB/SkipList.h Util/Arena.h Test/testMemTable.cc 
-	g++    DB/SkipList.h Util/Arena.h Test/testMemTable.cc  -g -o testSkipList
+testSkipList:  DB/SkipList.h Util/Arena.h Test/testskiplist.cc 
+	g++    DB/SkipList.h Util/Arena.h Test/testskiplist.cc  -g -o testSkipList
 
 
 clean:    
