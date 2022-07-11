@@ -13,7 +13,9 @@ class Comparator {
 
 public:
 
-    virtual ~Comparator() {};
+    virtual ~Comparator() {};           //类外面实现，default, no construct function, default
+
+    Comparator() = default;             //default 
 
     virtual int Compare(const Slice& a, const Slice& b) const = 0;
 

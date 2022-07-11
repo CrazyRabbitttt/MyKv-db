@@ -11,6 +11,9 @@ testCom:     Include/Comparator.h  Test/testComparator.cc Include/Slice.h Util/C
 testSkipList:  DB/SkipList.h Util/Arena.h Test/testskiplist.cc 
 	g++    DB/SkipList.h Util/Arena.h Test/testskiplist.cc  -g -o testSkipList
 
+testMemtable: DB/Memtable.h Util/Comparator.cc Test/testMemtable 
+	g++    DB/Memtable.h Util/Comparator.cc Test/testMemtable -g -o testMemtable
+
 
 clean:    
 	rm testSkipList

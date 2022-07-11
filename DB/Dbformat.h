@@ -1,11 +1,11 @@
 #ifndef KVDB_DBFORMAT_H_
 #define KVDB_DBFORMAT_H_
 
-#include <string>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <string>
-
+#include "../Include/Slice.h"
 #include "../Include/Comparator.h"
 namespace kvdb {
 
@@ -22,7 +22,7 @@ static const SequenceNumber kMaxSequenceNumber = ((0x1ull << 56) - 1);
 
 static const ValueType kValueTypeForSeek = kTypeValue;
 
-
+//获得用户的
 inline Slice ExtractUserKey(const Slice& internal_key) {
   return Slice(internal_key.data(), internal_key.size() - 8);
 }
@@ -87,6 +87,10 @@ class InternalKeyComparator : public Comparator {
     explicit InternalKeyComparator(const Comparator* c) 
         :user_comparator_(c) {}
     
+    ~InternalKeyComparator() {
+        printf("internalkeycom 的析构函数\n");
+    }
+
     const char* Name() const override;
 
     int Compare(const Slice& a, const Slice& b) const override;
@@ -103,8 +107,9 @@ class InternalKeyComparator : public Comparator {
 
 };
 
-
-
+inline int InternalKeyComparator::Compare(const InternalKey& a, const InternalKey& b) const {
+    return 1;
+}
 
 
 

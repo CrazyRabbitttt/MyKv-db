@@ -2,10 +2,10 @@
 #define KVDB_MEMTABLE_H_
 
 #include <string>
-#include "Dbformat.h"
-#include "SkipList.h"
+#include "../DB/Dbformat.h"
+#include "../DB/SkipList.h"
 #include "../Util/Arena.h"
-#include "Dbformat.h"
+#include "../Include/Status.h"
 
 
 namespace kvdb {

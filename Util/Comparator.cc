@@ -12,11 +12,15 @@ namespace kvdb {
 
 
 //匿名命名空间， 相当于是internal 
-namespace  compare{
+namespace  {
     //用字节顺序进行比较的比较器
 class ByteComparator : public Comparator {
  public:
     ByteComparator() = default;
+
+    ~ByteComparator() {
+        printf("byteComparaotr 析构函数...\n");
+    }
 
     const char* Name() const override { return "kvdb.ByteComparator";}
 

@@ -3,6 +3,7 @@
 
 namespace kvdb {
 
+    //将seq, type 进行打包
     static int PackSeqAndType(uint64_t seq, ValueType type) {
         //7-byte seq,    1-byte type 
         assert(seq <= kMaxSequenceNumber);
@@ -18,9 +19,31 @@ namespace kvdb {
         //Order :
         //1. user key(大的优先)
         //2. seq number(小的优先)
-        //3. type 
+        //3. type
+
+        //还是调用传入的比较的类的方法
+        int result = user_comparator_->Compare(ExtractUserKey(akey), ExtractUserKey(bey));
+        if (result == 0) {
+            const uint64_t anum = DecodeFixed64(akey.data() + akey.size() - 8);
+            const uint64_t bnum = DecodeFixed64(bey.data()  + bey.size()  - 8);
+            if (anum > bnum) {
+                result = -1;
+            } else if (anum < bnum) {
+                result = +1;
+            }
+        }
+        return result;
     }
 
+
+    void InternalKeyComparator::FindShortestSeparator(std::string* start, const Slice& limit) const {
+        //用于缩减user 的key 部分
+        printf("todo: internal key Find1...\n");
+    }
+
+    void InternalKeyComparator::FindShortSuccessor(std::string* key) const {
+        printf("todo: internalKey Find...\n");
+    }
     
     LookupKey::LookupKey(const Slice& user_key, SequenceNumber sequence) {
         size_t usize  = user_key.size();
@@ -48,10 +71,6 @@ namespace kvdb {
         dst += 8;
         end_ = dst;                                 //the end of the dst 
     }
-
-    
-
-
 
 
 }
