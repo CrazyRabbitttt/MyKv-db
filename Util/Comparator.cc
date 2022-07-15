@@ -12,7 +12,7 @@ namespace kvdb {
 
 
 //匿名命名空间， 相当于是internal 
-namespace  {
+
     //用字节顺序进行比较的比较器
 class ByteComparator : public Comparator {
  public:
@@ -67,7 +67,7 @@ class ByteComparator : public Comparator {
     }
 };
 
-}
+
 
 
 

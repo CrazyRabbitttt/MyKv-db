@@ -48,6 +48,7 @@ bool Get(const LookupKey& key, std::string* value, Status *status);
  private:
 //   friend class MemTableTierator;
 
+
   struct KeyComparator{
     //内部的比较器还是InternalKeyCom..........
     const InternalKeyComparator comparator;
@@ -55,7 +56,7 @@ bool Get(const LookupKey& key, std::string* value, Status *status);
         :comparator(c) {}
 
     //?????????
-    // int operator()(const char* a, const char* b) const;
+    int operator()(const char* a, const char* b) const;
   };
  
   typedef SkipList<const char*, KeyComparator> Table;
@@ -65,6 +66,9 @@ bool Get(const LookupKey& key, std::string* value, Status *status);
   ~Memtable();       //私有：因为只有UnRef() 才调用析构函数
   
   KeyComparator comparator_;
+
+  // ByteComparator byte_comparator;
+
   Arena arena_;
   Table table_;
  
