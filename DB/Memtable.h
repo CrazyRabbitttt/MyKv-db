@@ -10,7 +10,7 @@
 
 namespace kvdb {
 
-class InternalKeyComparator;
+class InternalKeyComparator;      //key comparator 
 
 class Memtable{
  public:
@@ -46,17 +46,13 @@ bool Get(const LookupKey& key, std::string* value, Status *status);
 
 
  private:
-//   friend class MemTableTierator;
+//   friend class MemTableTierator;       iterator 
 
-
-  struct KeyComparator{
-    //内部的比较器还是InternalKeyCom..........
-    const InternalKeyComparator comparator;
-    explicit KeyComparator(const InternalKeyComparator& c) 
-        :comparator(c) {}
-
-    //?????????
-    int operator()(const char* a, const char* b) const;
+  //内部重新对comparator 进行了封装
+  struct KeyComparator {  
+      const InternalKeyComparator comparator;     //internalkeyComparator
+      explicit KeyComparator(const InternalKeyComparator& c) : comparator(c) {}
+      int operator() (const char* a, const char* b) const;
   };
  
   typedef SkipList<const char*, KeyComparator> Table;

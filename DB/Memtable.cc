@@ -16,7 +16,14 @@ static Slice GetLengthPrefixedSlice(const char* data) {
 }
 
 
- 
+ int Memtable::KeyComparator::operator() (const char* stra, const char* strb) const {
+    //internal key 被encode 成为length-prefixed strings
+    Slice a = GetLengthPrefixedSlice(stra);
+    Slice b = GetLengthPrefixedSlice(strb);
+    return comparator.Compare(a, b);
+ }
+
+
  void Memtable::Add(SequenceNumber seq, ValueType type, const Slice& userkey, const Slice& value) {
 
     /*

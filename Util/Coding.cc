@@ -38,6 +38,13 @@ namespace kvdb {
         dst->append(buf, ptr - buf);    //将压缩过的内容写到dst中去
     }
 
+    void PutFixed64(std::string* dst, uint64_t v) {
+        char buf[sizeof(v)];
+        EncodeFixed64(buf, v);
+        dst->append(buf, sizeof(buf));
+    }
+
+
     char* EncodeVarint64(char* dst, uint64_t v) {
         static const int B = 128;
         uint8_t* ptr = reinterpret_cast<uint8_t*>(dst);
@@ -56,7 +63,7 @@ namespace kvdb {
     }
 
 
-    //返回传入的int的len
+    //返回需要压缩数据的len，7位为一组，因为1字节存储7位
     int VarintLength(uint64_t value) {
         //1 2 4 8 16 32 64 128
         int len = 1;

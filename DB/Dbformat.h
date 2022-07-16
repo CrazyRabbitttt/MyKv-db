@@ -22,10 +22,68 @@ static const SequenceNumber kMaxSequenceNumber = ((0x1ull << 56) - 1);
 
 static const ValueType kValueTypeForSeek = kTypeValue;
 
-//获得用户的
+//获得用户的key, 传入的是internalkey(也就是去掉seq, type)
 inline Slice ExtractUserKey(const Slice& internal_key) {
   return Slice(internal_key.data(), internal_key.size() - 8);
 }
+
+//internalkey的解析结构，能够直接获得三个字段
+struct ParsedInternalKey {
+    Slice user_key;
+    SequenceNumber seq;
+    ValueType type;
+
+    ParsedInternalKey() {}
+    ParsedInternalKey(const Slice& u, const SequenceNumber& s, ValueType t) 
+        :user_key(u), seq(s), type(t) {}
+    
+    //for debugging
+    std::string DebugString() const;
+};
+
+
+void AppendInternalKey(std::string* result, const ParsedInternalKey& key);
+
+
+//使用internalkey进行传入参数进行比较而不是仅仅的单纯的字符串
+class InternalKey {
+ private:
+    std::string rep_;
+
+ public:
+    InternalKey() {}
+
+    //传入user_key, seq, type,生成internalkey
+    InternalKey(const Slice& user_key, SequenceNumber s, ValueType t) {
+        AppendInternalKey(&rep_, ParsedInternalKey(user_key, s, t));
+    } 
+
+    //获得user_key from internalkey 
+    Slice user_key() const { return ExtractUserKey(rep_);}
+
+    bool DecodeFrom(const Slice &s) {
+        rep_.assign(s.data(), s.size());
+        return !rep_.empty();
+    }
+
+    Slice Encode() const {
+        assert(!rep_.empty());
+        return rep_;
+    }
+
+    void SetFrom(const ParsedInternalKey& p) {
+        rep_.clear();
+        AppendInternalKey(&rep_, p);
+    }
+
+    void Clear() { rep_.clear(); }
+
+    //std::string Debugging() const;
+
+};
+
+
+
 
 
 //A tool class for Get

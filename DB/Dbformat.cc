@@ -15,21 +15,30 @@ namespace kvdb {
         return "kvdb.InternalKeyComparator";
     }
     
+
+    void AppendInternalKey(std::string* result, const ParsedInternalKey& key) {
+        //将internal key 放入到result 中去
+        result->append(key.user_key.data(), key.user_key.size());
+        PutFixed64(result, PackSeqAndType(key.seq, key.type));
+    }
+
+
     int InternalKeyComparator::Compare(const Slice& akey, const Slice& bey) const {
         //Order :
         //1. user key(大的优先)
         //2. seq number(小的优先)
         //3. type
 
-        //还是调用传入的比较的类的方法
+        //还是调用传入的比较的类的方法, 传入的是internalKey
         int result = user_comparator_->Compare(ExtractUserKey(akey), ExtractUserKey(bey));
         if (result == 0) {
+            //userkey是相同的，开始获取seq进行比较
             const uint64_t anum = DecodeFixed64(akey.data() + akey.size() - 8);
             const uint64_t bnum = DecodeFixed64(bey.data()  + bey.size()  - 8);
-            if (anum > bnum) {
-                result = -1;
-            } else if (anum < bnum) {
+            if (anum < bnum) {
                 result = +1;
+            } else if(anum > bnum) {
+                result = -1;
             }
         }
         return result;
